@@ -661,6 +661,7 @@
 ; false
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn palabra-reservada? [x]
+      (contains? (set '("LOAD" "SAVE" "INPUT" "PRINT" "?" "DATA" "READ" "REM" "RESTORE" "CLEAR" "LET/=" "LIST" "NEW" "RUN" "END" "FOR" "TO" "NEXT" "STEP" "GOSUB" "RETURN" "GOTO" "IF" "THEN" "ENV" "EXIT" "AND" "OR" "ATN" "INT" "SIN" "LEN" "MID$" "ASC" "CHR$" "STR$")) (name 'a))
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
