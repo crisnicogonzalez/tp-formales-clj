@@ -15,4 +15,11 @@
          (is (= false (operador? (symbol "%"))))
          )
 
+
+(deftest test-is_valid?
+         (is (= true (is_valid? '+)))
+         (is (= true (is_valid? 'REM)))
+         (is (= false (is_valid?) 'SPACE))
+         (is (= true (is_valid?) (symbol "+")))
+         )
 (run-tests)

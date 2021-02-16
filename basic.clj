@@ -679,6 +679,9 @@
 
       )
 
+
+
+(defn is_valid? [x] (or (palabra-reservada? x) (operador? x)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; anular-invalidos: recibe una lista de simbolos y la retorna con
 ; aquellos que son invalidos reemplazados por nil, por ejemplo:
