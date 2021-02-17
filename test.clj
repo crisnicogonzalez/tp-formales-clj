@@ -32,5 +32,12 @@
          (is (= true (valido? 'REM)))
          (is (= false (valido? 'SPACE)))
          (is (= true (valido? (symbol "+")) ))
+         (is (= true (valido? (symbol "+")) ))
+         )
+
+
+(deftest test-anular-invalidos
+         (is (= '(IF) (anular-invalidos '(IF))))
+         (is (= '(nil) (anular-invalidos '(&))))
          )
 (run-tests)

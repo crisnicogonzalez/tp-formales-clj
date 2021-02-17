@@ -681,16 +681,15 @@
 
 
 
-(defn valido? [x] (or (palabra-reservada? x) (operador? x)))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn variable? [x]
       (contains? (set '("A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z")) (name x))
 
       )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn valido? [x] (or (or (palabra-reservada? x) (operador? x)) (variable? x)))
+
+
 ; anular-invalidos: recibe una lista de simbolos y la retorna con
 ; aquellos que son invalidos reemplazados por nil, por ejemplo:
 ; user=> (anular-invalidos '(IF X & * Y < 12 THEN LET ! X = 0))
@@ -699,6 +698,8 @@
 (defn anular-invalidos [sentencia]
       (map #(if (valido? %) % nil) sentencia)
       )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; cargar-linea: recibe una linea de codigo y un ambiente y retorna
