@@ -15,11 +15,22 @@
          (is (= false (operador? (symbol "%"))))
          )
 
+(deftest test-variable?
+         (is (= true (variable? 'A)))
+         (is (= true (variable? 'B)))
+         (is (= true (variable? 'C)))
+         (is (= true (variable? 'D)))
+         (is (= true (variable? 'E)))
+         (is (= true (variable? 'F)))
+         (is (= true (variable? 'G)))
+         (is (= true (variable? 'H)))
+         (is (= true (variable? 'I)))
+         )
 
-(deftest test-is_valid?
-         (is (= true (is_valid? '+)))
-         (is (= true (is_valid? 'REM)))
-         (is (= false (is_valid?) 'SPACE))
-         (is (= true (is_valid?) (symbol "+")))
+(deftest test-es-valido?
+         (is (= true (valido? '+)))
+         (is (= true (valido? 'REM)))
+         (is (= false (valido? 'SPACE)))
+         (is (= true (valido? (symbol "+")) ))
          )
 (run-tests)
