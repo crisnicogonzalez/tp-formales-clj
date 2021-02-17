@@ -47,4 +47,10 @@
           (is (= "1.5" (convertir_a_string 1.50)))
           (is (= "1.0" (convertir_a_string 1.0)))
           )
+
+
+(deftest test-separar-por-punto
+         (is ( = '("0" "1") (separar_por_punto "0.1")))
+         )
+
 (run-tests)

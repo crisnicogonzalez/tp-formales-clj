@@ -946,10 +946,15 @@
       )
 
 
-
 (defn convertir_a_string [x]
-        (if (symbol? x) (name x) (str x))
+       (if (symbol? x) (name x) (str x))
       )
+
+
+(defn separar_por_punto [x]
+      (re-seq #"[^.]+" x)
+      )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; eliminar-cero-decimal: recibe un numero y lo retorna sin ceros
