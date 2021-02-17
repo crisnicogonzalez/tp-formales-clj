@@ -40,4 +40,11 @@
          (is (= '(IF) (anular-invalidos '(IF))))
          (is (= '(nil) (anular-invalidos '(&))))
          )
+
+(deftest test-convertir-a-string
+          (is (= "A" (convertir_a_string 'A)))
+          (is (= "1.5" (convertir_a_string 1.5)))
+          (is (= "1.5" (convertir_a_string 1.50)))
+          (is (= "1.0" (convertir_a_string 1.0)))
+          )
 (run-tests)

@@ -945,6 +945,12 @@
 (defn aridad [token]
       )
 
+
+
+(defn convertir_a_string [x]
+        (if (symbol? x) (name x) (str x))
+      )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; eliminar-cero-decimal: recibe un numero y lo retorna sin ceros
 ; decimales no significativos, por ejemplo: 
