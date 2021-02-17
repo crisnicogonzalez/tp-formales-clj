@@ -994,9 +994,18 @@
 ; user=> (eliminar-cero-entero -0.5)
 ; "-.5"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn eliminar-cero-entero [n]
+
+
+(defn eliminar-cero-a-entero-part [n]
+      (clojure.string/replace n #"0." ".")
       )
 
+
+(defn eliminar-cero-entero [x]
+      (
+        if (nil? x) nil (if (symbol? x) (name x) (eliminar-cero-a-entero-part x))
+                   )
+      )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Despues de cargarse el archivo, debe mostrarse el valor true 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

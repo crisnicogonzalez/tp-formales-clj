@@ -53,4 +53,26 @@
          (is ( = '("0" "1") (separar_por_punto "0.1")))
          )
 
+
+(deftest test-eliminar-cero-a-entero-part
+         (is (= ".1" (eliminar-cero-a-entero-part "0.1")))
+         (is (= "-.1" (eliminar-cero-a-entero-part "-0.1")))
+         (is (= "-1.5" (eliminar-cero-a-entero-part "-1.5")))
+         (is (= "-1" (eliminar-cero-a-entero-part "-1")))
+         (is (= "1" (eliminar-cero-a-entero-part "1")))
+         (is (= "0" (eliminar-cero-a-entero-part "0")))
+  )
+
+
+
+(deftest test-eliminar-cero-a-entero
+         (is (= ".1" (eliminar-cero-entero "0.1")))
+         (is (= "-.1" (eliminar-cero-entero "-0.1")))
+         (is (= "-1.5" (eliminar-cero-entero "-1.5")))
+         (is (= "-1" (eliminar-cero-entero "-1")))
+         (is (= "1" (eliminar-cero-entero "1")))
+         (is (= "0" (eliminar-cero-entero "0")))
+         (is (= nil (eliminar-cero-entero nil)))
+         (is (= "A" (eliminar-cero-entero 'A)))
+         )
 (run-tests)
