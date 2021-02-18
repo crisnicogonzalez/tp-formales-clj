@@ -75,4 +75,13 @@
          (is (= nil (eliminar-cero-entero nil)))
          (is (= "A" (eliminar-cero-entero 'A)))
          )
+
+
+(deftest test-eliminar-cero-decimal
+         (is (= 1 (eliminar-cero-decimal 1.0)))
+         (is (= 1.5 (eliminar-cero-decimal 1.50)))
+         (is (= 1.5 (eliminar-cero-decimal 1.5)))
+         (is (= 1 (eliminar-cero-decimal 1)))
+         (is (= "A" (eliminar-cero-decimal 'A)))
+         )
 (run-tests)
