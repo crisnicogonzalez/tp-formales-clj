@@ -84,4 +84,18 @@
          (is (= 1 (eliminar-cero-decimal 1)))
          (is (= "A" (eliminar-cero-decimal 'A)))
          )
+
+
+(deftest test-variable-string
+         (is (= true (variable-string? 'X$)))
+         (is (= false (variable-string? 'X)))
+         (is (= false (variable-string? 'X%)))
+         )
+
+
+(deftest test-variable-integer
+         (is (= false (variable-integer? 'X$)))
+         (is (= false (variable-integer? 'X)))
+         (is (= true (variable-integer? 'X%)))
+         )
 (run-tests)
