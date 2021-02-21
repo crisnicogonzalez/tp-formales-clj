@@ -776,8 +776,23 @@
 ; user=> (dar-error "?ERROR DISK FULL" [100 3])
 ;
 ; ?ERROR DISK FULL IN 100nil
+
+
+(defn dar-error-por-nro [n]
+      (
+       (hash-map 16 "?SYNTAX ERROR") n)
+      )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn dar-error [cod prog-ptrs]
+      (do
+        (print
+          (str
+            (if (int? cod) (dar-error-por-nro cod) cod)
+            (if (keyword? (first prog-ptrs)) (str) (str " IN " (str (first prog-ptrs))))
+            )
+          )
+        nil
+        )
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
