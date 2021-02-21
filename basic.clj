@@ -737,8 +737,27 @@
 ; ((PRINT 1) (NEXT A , B))
 ; user=> (expandir-nexts n)
 ; ((PRINT 1) (NEXT A) (NEXT B))
+
+
+(defn no-next-no-comma [n]
+      (and (not= 'NEXT n) (not= (symbol ",")  n))
+      )
+
+
+(defn agregar-next-symbol [n]
+      (list 'NEXT n)
+      )
+
+(defn aux-expandir-next [n]
+      (map agregar-next-symbol (filter no-next-no-comma n))
+      )
+
+(defn map-expandir-next [n]
+      (if (= 'NEXT (first n)) (aux-expandir-next n) (list n))
+      )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn expandir-nexts [n]
+      (reverse (apply into (map map-expandir-next n)))
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

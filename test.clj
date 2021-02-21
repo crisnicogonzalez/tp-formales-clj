@@ -121,4 +121,28 @@
 (deftest test-cargar-linea
          (is (= ['((10 (PRINT X))) [:ejecucion-inmediata 0] [] [] [] 0 {}]  (cargar-linea '(10 (PRINT X)) [() [:ejecucion-inmediata 0] [] [] [] 0 {}]) ))
          )
+
+
+
+
+
+(deftest test-no-next-no-comma
+        (is (= false (no-next-no-comma 'NEXT)))
+         (is (= false (no-next-no-comma (symbol ",") )))
+         )
+
+(deftest test-agregar-next-symbol
+         (is (= '(NEXT A) (agregar-next-symbol 'A)))
+         )
+
+
+(deftest test-map-expandir-next
+        (is (= '((NEXT A) (NEXT B)) (map-expandir-next (list 'NEXT 'A (symbol ",") 'B))))
+         )
+
+
+
+(deftest test-expandir-next
+         (is (= '((PRINT 1) (NEXT A) (NEXT B)) (expandir-nexts (list '(PRINT 1) (list 'NEXT 'A (symbol ",") 'B)) ) ))
+         )
 (run-tests)
