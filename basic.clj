@@ -724,7 +724,7 @@
       )
 
 (defn cargar-linea [linea amb]
-      (cons (sort-by obtener-linea-codigo (cons linea (obtener-ambiente amb))) (rest amb))
+      (assoc amb 0 (sort-by obtener-linea-codigo (cons linea (obtener-ambiente amb))))
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -116,4 +116,9 @@
          (is (= 2 (aridad 'MID$)))
          (is (= 3 (aridad 'MID3$)))
          )
+
+
+(deftest test-cargar-linea
+         (is (= ['((10 (PRINT X))) [:ejecucion-inmediata 0] [] [] [] 0 {}]  (cargar-linea '(10 (PRINT X)) [() [:ejecucion-inmediata 0] [] [] [] 0 {}]) ))
+         )
 (run-tests)
