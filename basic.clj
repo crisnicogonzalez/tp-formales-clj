@@ -849,6 +849,16 @@
 ; 2
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn contar-sentencias [nro-linea amb]
+
+      (count
+        (rest
+          (first (filter
+                   (fn [linea] (= nro-linea (first linea)))
+                   (first amb)
+                   )
+                 )
+          )
+        )
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
