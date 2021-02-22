@@ -928,7 +928,22 @@
 ; user=> (continuar-linea [(list '(10 (PRINT X)) '(15 (GOSUB 100) (X = X + 1)) (list 20 (list 'NEXT 'I (symbol ",") 'J))) [20 3] [[15 2]] [] [] 0 {}])
 ; [:omitir-restante [((10 (PRINT X)) (15 (GOSUB 100) (X = X + 1)) (20 (NEXT I , J))) [15 1] [] [] [] 0 {}]]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn actualizar-puntero [amb]
+      (assoc (assoc amb 1 (first (amb 2))) 2 (vector))
+      )
+
 (defn continuar-linea [amb]
+      (if
+        (empty? (amb 2))
+        (do
+          (print
+            (str "?RETURN WITHOUT GOSUB ERROR IN" (first (amb 1)))
+            )
+          (vector nil amb)
+          )
+        (vector :omitir-restante amb)
+        )
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
