@@ -893,9 +893,27 @@
 ; user=> (buscar-lineas-restantes [(list '(10 (PRINT X) (PRINT Y)) '(15 (X = X + 1)) (list 20 (list 'NEXT 'I (symbol ",") 'J))) [25 0] [] [] [] 0 {}])
 ; nil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn map-representacion-intermedia [linea nro-linea lineas-restantes]
+      (if
+          (= (first linea) nro-linea)
+          (conj (take lineas-restantes (rest linea)) (first linea))
+          linea
+          )
+      )
+
+
 (defn buscar-lineas-restantes
       ([amb] (buscar-lineas-restantes (amb 1) (amb 0)))
-      ([act prg]
+      (
+       [act prg]
+       (if (or (empty? act) (empty? prg))
+         nil
+         (map
+           (fn [linea] (map-representacion-intermedia linea (act 0) (act 1)))
+           (filter (fn [linea] (<= (act 0) (first linea))) prg)
+           )
+         )
        )
       )
 
