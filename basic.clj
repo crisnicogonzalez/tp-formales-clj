@@ -942,7 +942,7 @@
             )
           (vector nil amb)
           )
-        (vector :omitir-restante amb)
+        (vector :omitir-restante (actualizar-puntero amb))
         )
       )
 
@@ -956,6 +956,35 @@
 ; ("HOLA" "MUNDO" 10 20)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn extraer-data [prg]
+
+      (map
+        (fn [x] (if
+                  (symbol? x)
+                  (name x)
+                  x
+                  )
+            )
+        (filter
+          (fn [x] (not= (symbol ",") x))
+          (apply concat
+                 (map
+                   (fn [linea] (rest linea))
+                   (filter
+                     (fn [linea] (= (first linea) 'DATA))
+                     (apply concat (map
+                                     (fn [linea]
+                                         (take-while (fn [comando] (not= (first comando) 'REM)) (rest linea))
+                                         )
+                                     prg
+                                     )
+                            )
+                     )
+                   )
+                 )
+          )
+
+        )
+
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
