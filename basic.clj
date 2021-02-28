@@ -714,7 +714,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn obtener-linea-codigo [linea]
-    (first linea)
+      (first linea)
       )
 
 
@@ -739,7 +739,7 @@
 
 
 (defn no-next-no-comma [n]
-      (and (not= 'NEXT n) (not= (symbol ",")  n))
+      (and (not= 'NEXT n) (not= (symbol ",") n))
       )
 
 
@@ -895,10 +895,10 @@
 
 (defn map-representacion-intermedia [linea nro-linea lineas-restantes]
       (if
-          (= (first linea) nro-linea)
-          (conj (take lineas-restantes (rest linea)) (first linea))
-          linea
-          )
+        (= (first linea) nro-linea)
+        (conj (take lineas-restantes (rest linea)) (first linea))
+        linea
+        )
       )
 
 
@@ -1000,6 +1000,9 @@
 ; [((10 (PRINT X))) [10 1] [] [] [] 0 {X$ "HOLA MUNDO"}]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn ejecutar-asignacion [sentencia amb]
+      (def expresion ((preprocesar-expresion (nthrest sentencia 2) amb)))
+      (def resultado (calcular-expresion expresion amb))
+      (assoc amb 6 (assoc (last amb) (first sentencia) (eliminar-cero-decimal resultado)))
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1017,10 +1020,10 @@
       (map
         (fn [x]
             (if
-              (contains? (amb 6)  x)
-              ((amb 6)  x)
+              (contains? (amb 6) x)
+              ((amb 6) x)
               (if
-                (or (operador? x) (and (re-matches #"[A-Z\s]*" (name x)) (> (count (name x) ) 2)  ) )
+                (or (or (number? x) (operador? x)) (and (re-matches #"[A-Z\s]*" (name x)) (> (count (name x)) 2)))
                 x
                 (if (variable-string? x) '"" 0)
                 )
@@ -1106,7 +1109,7 @@
 ; A
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn eliminar-cero-decimal [n]
-      (if (symbol? n) (name n)  (if (== (int n) n) (int n)  (/ (* n 10) 10)))
+      (if (symbol? n) (name n) (if (== (int n) n) (int n) (/ (* n 10) 10)))
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
