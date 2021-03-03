@@ -706,14 +706,18 @@
 
 (defn variable? [x]
       ;(println "variable?" x)
-      (contains? (set '("A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z")) (name x))
+      (some? (re-matches #"[A-Z]*" (str x)))
       )
 
 
 (defn valido? [x]
-      (or
-        (integer? x)
-        (or (variable-string? x) (or (or (palabra-reservada? x) (operador? x)) (variable? x)))
+      (if
+        (= (str x) ";")
+        true
+        (or
+          (or (integer? x) (string? x))
+          (or (variable-string? x) (or (or (palabra-reservada? x) (operador? x)) (variable? x)))
+          )
         )
       )
 

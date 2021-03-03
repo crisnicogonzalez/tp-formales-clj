@@ -30,7 +30,7 @@
 (deftest test-es-valido?
          (is (= true (valido? '+)))
          (is (= true (valido? 'REM)))
-         (is (= false (valido? 'SPACE)))
+         (is (= true (valido? 'SPACE)))
          (is (= true (valido? (symbol "+")) ))
          (is (= true (valido? (symbol "+")) ))
          )
@@ -39,6 +39,7 @@
 (deftest test-anular-invalidos
          (is (= '(IF) (anular-invalidos '(IF))))
          (is (= '(nil) (anular-invalidos '(&))))
+         (is (= '(S$ = HOLA) (anular-invalidos '(S$ = HOLA))))
          )
 
 (deftest test-convertir-a-string
