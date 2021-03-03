@@ -12,6 +12,7 @@
 (deftest test-operador?
          (is (= true (operador? '+)))
          (is (= true (operador? (symbol "+"))))
+         (is (= true (operador? (symbol "="))))
          (is (= false (operador? (symbol "%"))))
          )
 
@@ -62,6 +63,7 @@
          (is (= "-1" (eliminar-cero-a-entero-part "-1")))
          (is (= "1" (eliminar-cero-a-entero-part "1")))
          (is (= "0" (eliminar-cero-a-entero-part "0")))
+         (is (= nil (eliminar-cero-a-entero-part nil)))
   )
 
 
@@ -84,6 +86,7 @@
          (is (= 1.5 (eliminar-cero-decimal 1.5)))
          (is (= 1 (eliminar-cero-decimal 1)))
          (is (= "A" (eliminar-cero-decimal 'A)))
+         (is (= nil (eliminar-cero-decimal nil)))
          )
 
 
@@ -91,6 +94,7 @@
          (is (= true (variable-string? 'X$)))
          (is (= false (variable-string? 'X)))
          (is (= false (variable-string? 'X%)))
+         (is (= false (variable-string? nil)))
          )
 
 
@@ -98,6 +102,7 @@
          (is (= false (variable-integer? 'X$)))
          (is (= false (variable-integer? 'X)))
          (is (= true (variable-integer? 'X%)))
+         (is (= false (variable-integer? nil)))
          )
 
 
@@ -188,6 +193,7 @@
          (is (= (preprocesar-expresion '(X$ + " MUNDO" + Z$) ['((10 (PRINT X))) [10 1] [] [] [] 0 '{X$ "HOLA"}]) '("HOLA" + " MUNDO" + "")))
          (is (= (preprocesar-expresion '(X + . / Y% * Z) ['((10 (PRINT X))) [10 1] [] [] [] 0 '{X 5 Y% 2}]) '(5 + 0 / 2 * 0)))
          (is (= (preprocesar-expresion '(3) ['() [:ejecucion-inmediata 1] [] [] [] 0 '{}]) '(3)))
+         (is (= (preprocesar-expresion '(PRINT) ['() [:ejecucion-inmediata 1] [] [] [] 0 '{}]) '(PRINT)))
          (is (= (preprocesar-expresion (lazy-seq '(3)) ['() [:ejecucion-inmediata 1] [] [] [] 0 '{}]) '(3)))
 
          )
