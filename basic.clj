@@ -127,15 +127,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn evaluar-linea
       ([sentencias amb]
-       ;(println "evaluar-linea sentencias" sentencias)
-       ;(println "evaluar-linea amb" amb)
+       (println "evaluar-linea sentencias" sentencias)
+       (println "evaluar-linea amb" amb)
        (let [sentencias-con-nexts-expandidos (expandir-nexts sentencias)]
             (evaluar-linea sentencias-con-nexts-expandidos sentencias-con-nexts-expandidos amb)))
       ([linea sentencias amb]
-       ;(println "evaluar linea luego de no se que")
-       ;(println "linea" linea)
-       ;(println "sentencias" sentencias)
-       ;(println "amb" amb)
+       (println "evaluar linea luego de no se que")
+       (println "linea" linea)
+       (println "sentencias" sentencias)
+       (println "amb" amb)
        (if (empty? sentencias)
          [:sin-errores amb]
          (let [sentencia (anular-invalidos (first sentencias)), par-resul (evaluar sentencia amb)]
@@ -367,10 +367,10 @@
 ; 7
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn calcular-expresion [expr amb]
-      ;(println "calcular-expression -> " expr)
-      ;(println "calcular-expression ->" amb )
+      (println "calcular-expression -> " expr)
+      (println "calcular-expression ->" amb)
       (def result (preprocesar-expresion expr amb))
-      ;(println "calcular-expression result ->" result)
+      (println "calcular-expression result ->" result)
       (calcular-rpn (shunting-yard (desambiguar result)) (amb 1))
       )
 
@@ -449,8 +449,8 @@
 ; linea indicada
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn calcular-rpn [tokens nro-linea]
-      ;(println "calcular-rpn tokens" tokens)
-      ;(println "calcular-rpn nro-linea" nro-linea)
+      (println "calcular-rpn tokens" tokens)
+      (println "calcular-rpn nro-linea" nro-linea)
       (try
         (let [resu-redu
               (reduce
@@ -711,9 +711,10 @@
 
 
 (defn valido? [x]
-      ;(println "valido?" x)
-      ;(println "result abajo")
-      (or (integer? x) (or (or (palabra-reservada? x) (operador? x)) (variable? x)))
+      (or
+        (integer? x)
+        (or (variable-string? x) (or (or (palabra-reservada? x) (operador? x)) (variable? x)))
+        )
       )
 
 
@@ -723,9 +724,9 @@
 ; (IF X nil * Y < 12 THEN LET nil X = 0)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn anular-invalidos [sentencia]
-      ;(println "anular-invalidos")
-      ;(println "antes de anular" sentencia)
-      (map #(if (valido? %) % nil) sentencia)
+      (println "anular-invalidos")
+      (println "antes de anular" sentencia)
+      (spy (map #(if (valido? %) % nil) sentencia))
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1043,13 +1044,13 @@
 ; [((10 (PRINT X))) [10 1] [] [] [] 0 {X$ "HOLA MUNDO"}]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn ejecutar-asignacion [sentencia amb]
-      ;(println "ejecutar-asignacion sentencias->" sentencia)
-      ;(println "ejecutar-asignacion amb->"amb)
+      (println "ejecutar-asignacion sentencias->" sentencia)
+      (println "ejecutar-asignacion amb->" amb)
       (def expresion (preprocesar-expresion (nthrest sentencia 2) amb))
-      ;(println "ejecutar-asignacion ->expresion" expresion)
+      (println "ejecutar-asignacion ->expresion" expresion)
       (def resultado (calcular-expresion expresion amb))
-      ;(println "ejecutar-asignacion DESPUES expression ->" expresion)
-      ;(println "ejecutar-asignacion DESPUES resultado ->" resultado)
+      (println "ejecutar-asignacion DESPUES expression ->" expresion)
+      (println "ejecutar-asignacion DESPUES resultado ->" resultado)
       (assoc amb 6 (assoc (last amb) (first sentencia) (eliminar-cero-decimal resultado)))
       )
 
@@ -1065,10 +1066,10 @@
 
 
 (defn preprocesar-expresion [expr amb]
-      ;(println "preprocesar-expresion -> expr" expr)
-      ;(println "proprocesar-expresion-> amb" amb)
-      ;(println "proprocesar-expresion-> amb 6" (amb 6) )
-      ;(println "preprocesar-expresion-> " (type expr))
+      (println "preprocesar-expresion -> expr" expr)
+      (println "proprocesar-expresion-> amb" amb)
+      (println "proprocesar-expresion-> amb 6" (amb 6))
+      (println "preprocesar-expresion-> " (type expr))
       (map
         (fn [x]
             (if
@@ -1119,6 +1120,20 @@
       ((hash-map (symbol ",") 0, 'OR 1, 'AND 2, '* 6, '-u 7 'MID$ 9) token)
       )
 
+
+(defn precedencia-8 [token] (contains? (hash-set (symbol "^")) token))
+(defn precedencia-7 [token] (contains? (hash-set '-u) token))
+(defn precedencia-6 [token] (contains? (hash-set '* '/) token))
+(defn precedencia-5 [token] (contains? (hash-set '+ '-) token))
+(defn precedencia-4 [token] (contains? (hash-set '= '<> '>< '< '> '<= '=< '>= '=>) token))
+(defn precedencia-3 [token] (contains? (hash-set 'NOT) token))
+(defn precedencia-2 [token] (contains? (hash-set 'AND) token))
+(defn precedencia-1 [token] (contains? (hash-set 'OR) token))
+(defn precedencia-0 [token] (contains? (hash-set (symbol ",")) token))
+(defn precedencia-nil [token] (contains? (hash-set (symbol "(") (symbol ")")) token))
+
+(defn precedencia [token] (cond (precedencia-nil token) nil (precedencia-0 token) 0 (precedencia-1 token) 1 (precedencia-2 token) 2 (precedencia-3 token) 3 (precedencia-4 token) 4 (precedencia-5 token) 5 (precedencia-6 token) 6 (precedencia-7 token) 7 (precedencia-8 token) 8 :else 9))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; aridad: recibe un token y retorna el valor de su aridad, por
 ; ejemplo:
@@ -1134,10 +1149,18 @@
 ; 3
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn aridad [token]
-      (if (number? token)
-        0
-        ((hash-map 'THEN 0, 'SIN 1, '* 2, 'MID3$ 3 'MID$ 2) token)
-        )
+      (println "aridad:" token)
+      (spy (cond
+             (some? (re-matches #"[0-9]*" (str token))) 0
+             (= "-u" (str token)) 1
+             (operador? token) 2
+             (= "THEN" (str token)) 0
+             (= "MID$" (str token)) 2
+             (= "MID3$" (str token)) 3
+             (contains? #{"ATN" "INT" "SIN" "LEN" "ASC" "CHR$" "STR$"} (str token)) 1
+             :else 0
+             )
+           )
       )
 
 
@@ -1164,8 +1187,11 @@
 ; A
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn eliminar-cero-decimal [n]
-      ;(println "eliminar-cero-decimal -> n" n)
-      (if (symbol? n) (name n) (if (== (int n) n) (int n) (/ (* n 10) 10)))
+      (println "eliminar-cero-decimal -> n" n)
+      (if
+        (or (string? n) (symbol? n))
+        (str n)
+        (if (== (int n) n) (int n) (/ (* n 10) 10)))
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
