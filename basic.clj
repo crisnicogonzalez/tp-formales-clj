@@ -127,15 +127,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn evaluar-linea
       ([sentencias amb]
-       (println "evaluar-linea sentencias" sentencias)
-       (println "evaluar-linea amb" amb)
+       ;(println "evaluar-linea sentencias" sentencias)
+       ;(println "evaluar-linea amb" amb)
        (let [sentencias-con-nexts-expandidos (expandir-nexts sentencias)]
             (evaluar-linea sentencias-con-nexts-expandidos sentencias-con-nexts-expandidos amb)))
       ([linea sentencias amb]
-       (println "evaluar linea luego de no se que")
-       (println "linea" linea)
-       (println "sentencias" sentencias)
-       (println "amb" amb)
+       ;(println "evaluar linea luego de no se que")
+       ;(println "linea" linea)
+       ;(println "sentencias" sentencias)
+       ;(println "amb" amb)
        (if (empty? sentencias)
          [:sin-errores amb]
          (let [sentencia (anular-invalidos (first sentencias)), par-resul (evaluar sentencia amb)]
@@ -449,8 +449,8 @@
 ; linea indicada
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn calcular-rpn [tokens nro-linea]
-      (println "calcular-rpn tokens" tokens)
-      (println "calcular-rpn nro-linea" nro-linea)
+      ;(println "calcular-rpn tokens" tokens)
+      ;(println "calcular-rpn nro-linea" nro-linea)
       (try
         (let [resu-redu
               (reduce
@@ -557,7 +557,7 @@
                      (do (dar-error 200 (amb 1)) [nil amb])) ; Load within program error
               SAVE (if (= (first (amb 1)) :ejecucion-inmediata)
                      (let [resu (grabar-arch (apply str (next sentencia)) amb)]
-                          (println "resu post ejecutar-asignacion" resu)
+                          ;(println "resu post ejecutar-asignacion" resu)
                           (if (nil? resu)
                             [nil amb]
                             [:sin-errores amb]))
@@ -699,7 +699,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn operador? [x]
       ;(println "operador?" x)
-      (contains? (set '("+" "-" "*" "/" "^" "=" "<>" "<:" "<=:" ">:" ">=:" "?")) (name x))
+      (contains? (set '("+" "-" "*" "/" "^" "=" "<>" "<:" "<=:" ">:" ">=:" "?" "(" ")" ":")) (name x))
       )
 
 
@@ -712,7 +712,7 @@
 
 (defn valido? [x]
       (if
-        (= (str x) ";")
+        (or (= (str x) ",") (= (str x) ";"))
         true
         (or
           (or (integer? x) (string? x))
@@ -728,10 +728,10 @@
 ; (IF X nil * Y < 12 THEN LET nil X = 0)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn anular-invalidos [sentencia]
-      (println "anular-invalidos")
-      (println "antes de anular" sentencia)
-      (spy (map #(if (valido? %) % nil) sentencia))
-      )
+      ;(println "anular-invalidos")
+      ;(println "antes de anular" sentencia)
+      (spy
+        (map #(if (valido? %) % nil) sentencia)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -758,10 +758,16 @@
       )
 
 (defn cargar-linea [linea amb]
-      ;(println "cargar-linea")
-      ;(println linea)
-      ;(println amb)
-      (assoc amb 0 (sort-by obtener-linea-codigo (cons linea (obtener-ambiente amb))))
+      (println "cargar-linea")
+      (println linea)
+      (println amb)
+      (def ambiente
+        (filter
+          (fn [x] (not (= (first x) (first linea))))
+        (obtener-ambiente amb)
+        ))
+      (println "amiente" ambiente)
+      (spy (assoc amb 0 (sort-by obtener-linea-codigo (cons linea ambiente))))
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -794,11 +800,10 @@
       )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn expandir-nexts [n]
-      ;(println "expandir-netxs n->" n)
-      ;(println "expandir-netxs type->" (type n))
-      ; (spy)
-      (reverse (apply into (map map-expandir-next n)))
-
+      (println "expandir-netxs n->" n)
+      (spy
+        (reverse (apply into (map map-expandir-next n)))
+        )
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -825,9 +830,9 @@
       )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn dar-error [cod prog-ptrs]
-      (println "dar-error")
-      (spy cod)
-      (spy prog-ptrs)
+      ;(println "dar-error")
+      ;(spy cod)
+      ;(spy prog-ptrs)
       (do
         (print
           (str
@@ -850,7 +855,7 @@
 ; false
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn variable-float? [x]
-      (println "variable-float?" x)
+      ;(println "variable-float?" x)
       (some? (re-matches #"[A-Z]" (name x)))
       )
 
@@ -865,8 +870,8 @@
 ; false
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn variable-integer? [x]
-      (println "variable-interger?" x)
-      (spy (clojure.string/includes? (name x) "%"))
+      ;(println "variable-interger?" x)
+      (clojure.string/includes? (name x) "%")
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -880,7 +885,7 @@
 ; false
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn variable-string? [x]
-      (println "variable-string?" x)
+      ;(println "variable-string?" x)
       (clojure.string/includes? (name x) "$")
       )
 
@@ -1048,13 +1053,13 @@
 ; [((10 (PRINT X))) [10 1] [] [] [] 0 {X$ "HOLA MUNDO"}]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn ejecutar-asignacion [sentencia amb]
-      (println "ejecutar-asignacion sentencias->" sentencia)
-      (println "ejecutar-asignacion amb->" amb)
+      ;(println "ejecutar-asignacion sentencias->" sentencia)
+      ;(println "ejecutar-asignacion amb->" amb)
       (def expresion (preprocesar-expresion (nthrest sentencia 2) amb))
-      (println "ejecutar-asignacion ->expresion" expresion)
+      ;(println "ejecutar-asignacion ->expresion" expresion)
       (def resultado (calcular-expresion expresion amb))
-      (println "ejecutar-asignacion DESPUES expression ->" expresion)
-      (println "ejecutar-asignacion DESPUES resultado ->" resultado)
+      ;(println "ejecutar-asignacion DESPUES expression ->" expresion)
+      ;(println "ejecutar-asignacion DESPUES resultado ->" resultado)
       (assoc amb 6 (assoc (last amb) (first sentencia) (eliminar-cero-decimal resultado)))
       )
 
@@ -1070,10 +1075,10 @@
 
 
 (defn preprocesar-expresion [expr amb]
-      (println "preprocesar-expresion -> expr" expr)
-      (println "proprocesar-expresion-> amb" amb)
-      (println "proprocesar-expresion-> amb 6" (amb 6))
-      (println "preprocesar-expresion-> " (type expr))
+      ;(println "preprocesar-expresion -> expr" expr)
+      ;(println "proprocesar-expresion-> amb" amb)
+      ;(println "proprocesar-expresion-> amb 6" (amb 6))
+      ;(println "preprocesar-expresion-> " (type expr))
       (map
         (fn [x]
             (if
@@ -1153,18 +1158,17 @@
 ; 3
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn aridad [token]
-      (println "aridad:" token)
-      (spy (cond
-             (some? (re-matches #"[0-9]*" (str token))) 0
-             (= "-u" (str token)) 1
-             (operador? token) 2
-             (= "THEN" (str token)) 0
-             (= "MID$" (str token)) 2
-             (= "MID3$" (str token)) 3
-             (contains? #{"ATN" "INT" "SIN" "LEN" "ASC" "CHR$" "STR$"} (str token)) 1
-             :else 0
-             )
-           )
+      ;(println "aridad:" token)
+      (cond
+        (some? (re-matches #"[0-9]*" (str token))) 0
+        (= "-u" (str token)) 1
+        (operador? token) 2
+        (= "THEN" (str token)) 0
+        (= "MID$" (str token)) 2
+        (= "MID3$" (str token)) 3
+        (contains? #{"ATN" "INT" "SIN" "LEN" "ASC" "CHR$" "STR$"} (str token)) 1
+        :else 0
+        )
       )
 
 
@@ -1191,7 +1195,7 @@
 ; A
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn eliminar-cero-decimal [n]
-      (println "eliminar-cero-decimal -> n" n)
+      ;(println "eliminar-cero-decimal -> n" n)
       (if
         (or (string? n) (symbol? n))
         (str n)
