@@ -615,9 +615,6 @@
               LIST (mostrar-listado (first amb))
               RESTORE [:sin-errores (assoc amb 5 0)]
               READ (leer-data (rest sentencia) amb)
-              CLEAR (if (not= (count sentencia) 1)
-                      (dar-error 16 (first (amb 1)))
-                      [:sin-errores [(amb 0) (amb 1) (amb 2) (amb 3) (amb 4) 0 (hash-map)]])
               LET (evaluar (rest sentencia) amb)
               CLEAR (if (not= (count sentencia) 1)
                       (dar-error 16 (first (amb 1)))
@@ -655,6 +652,10 @@
          (case operador
                -u (- operando)
                LEN (count operando)
+               INT (if (not (number? operando)) (dar-error 163 nro-linea) (int operando))
+               ASC (if (not (string? operando)) (dar-error 163 nro-linea) (int (first operando)))
+               SIN (if (not (number? operando)) (dar-error 163 nro-linea) (Math/sin operando))
+               ATN (if (not (number? operando)) (dar-error 163 nro-linea) (Math/atan operando))
                STR$ (if (not (number? operando)) (dar-error 163 nro-linea) (eliminar-cero-entero operando)) ; Type mismatch error
                CHR$ (if (or (< operando 0) (> operando 255)) (dar-error 53 nro-linea) (str (char operando)))))) ; Illegal quantity error
       ([operador operando1 operando2 nro-linea]
@@ -683,10 +684,14 @@
                  = (if (and (string? operando1) (string? operando2))
                      (if (= operando1 operando2) 1 0)
                      (if (= (+ 0 operando1) (+ 0 operando2)) 1 0))
+                 - (if (and (number? operando1) (number? operando2))
+                     (- operando1 operando2)
                  + (if (and (string? operando1) (string? operando2))
                      (str operando1 operando2)
                      (+ operando1 operando2))
                  / (if (= operando2 0) (dar-error 133 nro-linea) (/ operando1 operando2)) ; Division by zero error
+                 * (if (and (number? operando1) (number? operando2))
+                     (* operando1 operando2))
                  AND (let [op1 (+ 0 operando1), op2 (+ 0 operando2)] (if (and (not= op1 0) (not= op2 0)) 1 0))
                  MID$ (if (< operando2 1)
                         (dar-error 53 nro-linea)            ; Illegal quantity error
@@ -720,7 +725,7 @@
         (if
           (nil? x)
           false
-          (contains? (set '("LOAD" "SAVE" "INPUT" "PRINT" "?" "DATA" "READ" "REM" "RESTORE" "CLEAR" "LET/=" "LIST" "NEW" "RUN" "END" "FOR" "TO" "NEXT" "STEP" "GOSUB" "RETURN" "GOTO" "IF" "THEN" "ENV" "EXIT" "AND" "OR" "ATN" "INT" "SIN" "LEN" "MID$" "ASC" "CHR$" "STR$" "LET" "MID$")) (name x))
+          (contains? (set '("LOAD" "SAVE" "ON" "INPUT" "PRINT" "?" "DATA" "READ" "REM" "RESTORE" "CLEAR" "LET/=" "LIST" "NEW" "RUN" "END" "FOR" "TO" "NEXT" "STEP" "GOSUB" "RETURN" "GOTO" "IF" "THEN" "ENV" "EXIT" "AND" "OR" "ATN" "INT" "SIN" "LEN" "MID$" "ASC" "CHR$" "STR$" "LET" "MID$")) (name x))
           )
         )
       )
@@ -740,7 +745,7 @@
       (spy (if
              (or (nil? x) (string? x))
              false
-             (contains? (set '("+" "-" "*" "/" "^" "=" "<>" "<:" "<=:" ">:" ">=:" "?" ":" "AND" "OR" "<" ">")) (name x))
+             (contains? (set '("+" "-" "*" "/" "^" "=" "<>" "<:" "<=:" ">:" ">=:" "?" ":" "AND" "OR" "<" ">")) (str x))
              )
            )
       )
@@ -757,14 +762,18 @@
 
 
 (defn valido? [x]
-      (if
-        (contains? (set '("," ";" "(" ")")) (str x))
-        true
-        (or
-          (or (integer? x) (string? x))
-          (or (variable-string? x) (or (or (palabra-reservada? x) (operador? x)) (variable? x)))
+      (println "valido? " x)
+      (spy
+        (if
+          (contains? (set '("," ";" "(" ")")) (str x))
+          true
+          (or
+            (or (integer? x) (string? x))
+            (or (variable-string? x) (or (or (palabra-reservada? x) (operador? x)) (variable? x)))
+            )
           )
         )
+
       )
 
 
@@ -827,28 +836,24 @@
 ; ((PRINT 1) (NEXT A) (NEXT B))
 
 
-(defn no-next-no-comma [n]
-      (and (not= 'NEXT n) (not= (symbol ",") n))
+(defn concatenar-next [arr]
+      (map #(list 'NEXT %) arr)
       )
 
-
-(defn agregar-next-symbol [n]
-      (list 'NEXT n)
+(defn obtener-lista-nexts [nexts]
+      (filter (fn [next] (not= (symbol ",") next)) (rest nexts))
       )
 
-(defn aux-expandir-next [n]
-      (map agregar-next-symbol (filter no-next-no-comma n))
-      )
-
-(defn map-expandir-next [n]
-      (if (= 'NEXT (first n)) (aux-expandir-next n) (list n))
-      )
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn expandir-nexts [n]
-      (println "expandir-netxs n->" n)
-      (spy
-        (reverse (apply into (map map-expandir-next n)))
-        )
+      (apply concat
+             (map (fn [elem]
+                      (if (= (first elem) 'NEXT)
+                        (let [lista-nexts (obtener-lista-nexts elem)]
+                             (if (> (count lista-nexts) 0)
+                               (concatenar-next (obtener-lista-nexts elem))
+                               (list '(NEXT)))
+                             )
+                        (list elem))) n))
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1012,14 +1017,15 @@
       ([amb] (buscar-lineas-restantes (amb 1) (amb 0)))
       (
        [act prg]
-       (println "buscar-linea-restantes")
-       (if (or (empty? act) (empty? prg))
-         nil
-         (map
-           (fn [linea] (map-representacion-intermedia linea (act 0) (act 1)))
-           (filter (fn [linea] (<= (act 0) (first linea))) prg)
-           )
-         )
+       (println "buscar-linea-restantes -> act" act)
+       (println "buscar-linea-restantes -> prg" prg)
+       (spy (if (or (empty? act) (empty? prg))
+              nil
+              (map
+                (fn [linea] (map-representacion-intermedia linea (act 0) (act 1)))
+                (filter (fn [linea] (<= (act 0) (first linea))) prg)
+                )
+              ))
        )
       )
 
@@ -1173,7 +1179,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn desambiguar [expr]
       (println "desambiguar")
-      (desambiguar-mas-menos (desambiguar-mas-menos expr))
+      (desambiguar-mas-menos (desambiguar-mid expr))
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1219,13 +1225,10 @@
 
 (defn aridad-conf [token]
       (cond
-        (some? (re-matches #"[0-9]*" (str token))) 0
-        (= "-u" (str token)) 1
+        (contains? #{'NOT '-u 'LOAD 'SAVE 'PRINT 'GOSUB 'REM 'LET 'GOTO 'IF 'ON 'ATN 'INT 'SIN 'LEN 'ASC 'CHR$ 'STR$} token) 1
         (operador? token) 2
-        (= "THEN" (str token)) 0
-        (= "MID$" (str token)) 2
-        (= "MID3$" (str token)) 3
-        (contains? #{"ATN" "INT" "SIN" "LEN" "ASC" "CHR$" "STR$"} (str token)) 1
+        (contains? #{'OR 'AND (symbol "^") 'MID$} token) 2
+        (= 'MID3$ token) 3
         :else 0
         )
       )

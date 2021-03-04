@@ -7,6 +7,7 @@
          (is (= false (palabra-reservada? 'SPACE)))
          (is (= true (palabra-reservada? 'DATA)))
          (is (= true (palabra-reservada? 'READ)))
+         (is (= true (palabra-reservada? 'ON)))
          )
 
 (deftest test-operador?
@@ -17,6 +18,7 @@
          (is (= true (operador? (symbol ">"))))
          (is (= true (operador? (symbol "<"))))
          (is (= false (operador? "*")))
+         (is (= false (operador? 2)))
          )
 
 (deftest test-variable?
@@ -125,6 +127,7 @@
          (is (= 2 (aridad '*)))
          (is (= 2 (aridad 'MID$)))
          (is (= 3 (aridad 'MID3$)))
+         (is (= 0 (aridad 2)))
          )
 
 
