@@ -95,6 +95,7 @@
          (is (= false (variable-string? 'X)))
          (is (= false (variable-string? 'X%)))
          (is (= false (variable-string? nil)))
+         (is (= false (variable-string? 'MID$)))
          )
 
 
@@ -195,7 +196,7 @@
          (is (= (preprocesar-expresion '(3) ['() [:ejecucion-inmediata 1] [] [] [] 0 '{}]) '(3)))
          (is (= (preprocesar-expresion '(PRINT) ['() [:ejecucion-inmediata 1] [] [] [] 0 '{}]) '(PRINT)))
          (is (= (preprocesar-expresion (lazy-seq '(3)) ['() [:ejecucion-inmediata 1] [] [] [] 0 '{}]) '(3)))
-
+         (is (= (preprocesar-expresion '(MID$) ['() [:ejecucion-inmediata 1] [] [] [] 0 '{}]) '(MID$)))
          )
 
 

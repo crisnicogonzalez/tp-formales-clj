@@ -134,10 +134,11 @@
        (println "evaluar linea luego de no se que")
        (println "evaluar-linea linea" linea)
        (println "evaluar-linea sentencias" sentencias)
-       (println "evaluar-linea amb" amb)
        (if (empty? sentencias)
          [:sin-errores amb]
          (let [sentencia (anular-invalidos (first sentencias)), par-resul (evaluar sentencia amb)]
+              (println "EVALUAR-LINEA sentencia ->" sentencia)
+              (println "EVALUAR-LINEA par-result -> " par-resul)
               (if (or (nil? (first par-resul)) (contains? #{:omitir-restante, :error-parcial, :for-inconcluso} (first par-resul)))
                 (if (and (= (first (amb 1)) :ejecucion-inmediata) (= (first par-resul) :for-inconcluso))
                   (recur linea (take-last (second (second (second par-resul))) linea) (second par-resul))
@@ -425,7 +426,7 @@
 ; (1 2 +)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn shunting-yard [tokens]
-      ;(println "shunting-yard")
+      (println "shunting-yard")
       (remove #(= % (symbol ","))
               (flatten
                 (reduce
@@ -447,8 +448,8 @@
 ; linea indicada
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn calcular-rpn [tokens nro-linea]
-      ;(println "calcular-rpn tokens" tokens)
-      ;(println "calcular-rpn nro-linea" nro-linea)
+      (println "calcular-rpn tokens" tokens)
+      (println "calcular-rpn nro-linea" nro-linea)
       (try
         (let [resu-redu
               (reduce
@@ -484,8 +485,8 @@
 (defn imprimir
       ([v]
        (let [expresiones (v 0), amb (v 1)]
-            (println "imprimir expresiones->" expresiones)
-            (println "v->" v)
+            (println "IMPRIMIR expresiones->" expresiones)
+            (println "IMPRIMIR v->" v)
             (cond
               (empty? expresiones) (do (prn) (flush) :sin-errores)
               (and (empty? (next expresiones)) (= (first expresiones) (list (symbol ";")))) (do (pr) (flush) :sin-errores)
@@ -497,6 +498,8 @@
                            resu
                            (do (print resu) (flush) (recur [(next expresiones) amb])))))))
       ([lista-expr amb]
+       (println "IMPRIMIR list-expr ->" lista-expr)
+       (println "IMPRIMIR amb ->" amb)
        (let [nueva (cons (conj [] (first lista-expr)) (rest lista-expr)),
              variable? #(or (variable-integer? %) (variable-float? %) (variable-string? %)),
              funcion? #(and (> (aridad %) 0) (not (operador? %))),
@@ -687,7 +690,7 @@
         (if
           (nil? x)
           false
-          (contains? (set '("LOAD" "SAVE" "INPUT" "PRINT" "?" "DATA" "READ" "REM" "RESTORE" "CLEAR" "LET/=" "LIST" "NEW" "RUN" "END" "FOR" "TO" "NEXT" "STEP" "GOSUB" "RETURN" "GOTO" "IF" "THEN" "ENV" "EXIT" "AND" "OR" "ATN" "INT" "SIN" "LEN" "MID$" "ASC" "CHR$" "STR$" "LET")) (name x))
+          (contains? (set '("LOAD" "SAVE" "INPUT" "PRINT" "?" "DATA" "READ" "REM" "RESTORE" "CLEAR" "LET/=" "LIST" "NEW" "RUN" "END" "FOR" "TO" "NEXT" "STEP" "GOSUB" "RETURN" "GOTO" "IF" "THEN" "ENV" "EXIT" "AND" "OR" "ATN" "INT" "SIN" "LEN" "MID$" "ASC" "CHR$" "STR$" "LET" "MID$")) (name x))
           )
         )
       )
@@ -707,7 +710,7 @@
       (if
         (nil? x)
         false
-        (contains? (set '("+" "-" "*" "/" "^" "=" "<>" "<:" "<=:" ">:" ">=:" "?" "(" ")" ":")) (name x))
+        (contains? (set '("+" "-" "*" "/" "^" "=" "<>" "<:" "<=:" ">:" ">=:" "?" ":" "AND" "OR")) (name x))
         )
       )
 
@@ -724,7 +727,7 @@
 
 (defn valido? [x]
       (if
-        (or (= (str x) ",") (= (str x) ";"))
+        (contains? (set '("," ";" "(" ")")) (str x))
         true
         (or
           (or (integer? x) (string? x))
@@ -902,7 +905,7 @@
 (defn variable-string? [x]
       (println "variable-string?" x)
       (if
-        (nil? x)
+        (or (nil? x) (palabra-reservada? x))
         false
         (clojure.string/includes? (name x) "$")
         )
@@ -1093,27 +1096,35 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+
+
 (defn preprocesar-expresion [expr amb]
       (println "preprocesar-expresion -> expr" expr)
       (println "proprocesar-expresion-> amb 6" (amb 6))
-      (if
-        (or (nil? expr) (every? (fn [x] (nil? x)) expr))
-        expr
-        (map
-          (fn [x]
-              (if
-                (contains? (amb 6) x)
-                ((amb 6) x)
+      (spy
+        (if
+          (or (nil? expr) (every? (fn [x] (nil? x)) expr))
+          expr
+          (map
+            (fn [x]
                 (if
-                  (or (or (or (number? x) (string? x)) (or (operador? x) (palabra-reservada? x))) (and (re-matches #"[A-Z\s]*" (name x)) (> (count (name x)) 2)))
-                  x
-                  (if (variable-string? x) '"" 0)
+                  (contains? (amb 6) x)
+                  ((amb 6) x)
+                  (cond
+                    (number? x) x
+                    (string? x) x
+                    (operador? x) x
+                    (palabra-reservada? x) x
+                    (and (re-matches #"[A-Z\s]*" (name x)) (> (count (name x)) 2)) x
+                    (contains? (set '(")" "(" ",")) (str x)) x
+                    (variable-string? x) ""
+                    :else 0
+                    )
                   )
                 )
-              )
-          expr)
+            expr)
+          )
         )
-
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1174,9 +1185,8 @@
 ; 2
 ; user=> (aridad 'MID3$)
 ; 3
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn aridad [token]
-      (println "aridad:" token)
+
+(defn aridad-conf [token]
       (cond
         (some? (re-matches #"[0-9]*" (str token))) 0
         (= "-u" (str token)) 1
@@ -1187,6 +1197,11 @@
         (contains? #{"ATN" "INT" "SIN" "LEN" "ASC" "CHR$" "STR$"} (str token)) 1
         :else 0
         )
+      )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn aridad [token]
+      (println "aridad:" token)
+      (spy (aridad-conf token))
       )
 
 
@@ -1213,7 +1228,6 @@
 ; A
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn eliminar-cero-decimal [n]
-      (println "eliminar-cero-decimal -> n" n)
       (cond
         (nil? n) n
         (string? n) n
@@ -1257,6 +1271,7 @@
 
 
 (defn eliminar-cero-entero [x]
+      (println "eliminar-cero-entero")
       (
         if (nil? x) nil (if (symbol? x) (name x) (eliminar-cero-a-entero-part x))
                     )
