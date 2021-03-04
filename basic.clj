@@ -454,13 +454,15 @@
         (let [resu-redu
               (reduce
                 (fn [pila token]
+                    (println "pila" pila)
+                    (println "token" token)
                     (let [ari (aridad token),
                           resu (eliminar-cero-decimal
-                                 (case ari
-                                       1 (aplicar token (first pila) nro-linea)
-                                       2 (aplicar token (second pila) (first pila) nro-linea)
-                                       3 (aplicar token (nth pila 2) (nth pila 1) (nth pila 0) nro-linea)
-                                       token))]
+                                 (spy (case ari
+                                            1 (aplicar token (first pila) nro-linea)
+                                            2 (spy (aplicar token (second pila) (first pila) nro-linea))
+                                            3 (aplicar token (nth pila 2) (nth pila 1) (nth pila 0) nro-linea)
+                                            token)))]
                          (if (nil? resu)
                            (reduced resu)
                            (cons resu (drop ari pila)))))
@@ -636,7 +638,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn aplicar
       ([operador operando nro-linea]
-       (println "apicar")
+       (println "aplicar")
        (if (nil? operando)
          (dar-error 16 nro-linea)                           ; Syntax error
          (case operador
@@ -645,11 +647,14 @@
                STR$ (if (not (number? operando)) (dar-error 163 nro-linea) (eliminar-cero-entero operando)) ; Type mismatch error
                CHR$ (if (or (< operando 0) (> operando 255)) (dar-error 53 nro-linea) (str (char operando)))))) ; Illegal quantity error
       ([operador operando1 operando2 nro-linea]
+       (println "aplicar 2 ->" operador operando1 operando2)
        (if (or (nil? operando1) (nil? operando2))
          (dar-error 16 nro-linea)                           ; Syntax error
          (if (= operador (symbol "^"))
            (Math/pow operando1 operando2)
            (case operador
+                 < (if (< (+ 0 operando1) (+ 0 operando2)) 1 0)
+                 > (if (> (+ 0 operando1) (+ 0 operando2)) 1 0)
                  = (if (and (string? operando1) (string? operando2))
                      (if (= operando1 operando2) 1 0)
                      (if (= (+ 0 operando1) (+ 0 operando2)) 1 0))
@@ -707,11 +712,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn operador? [x]
       (println "operador?" x)
-      (if
-        (nil? x)
-        false
-        (contains? (set '("+" "-" "*" "/" "^" "=" "<>" "<:" "<=:" ">:" ">=:" "?" ":" "AND" "OR")) (name x))
-        )
+      (spy (if
+             (nil? x)
+             false
+             (contains? (set '("+" "-" "*" "/" "^" "=" "<>" "<:" "<=:" ">:" ">=:" "?" ":" "AND" "OR" "<" ">")) (name x))
+             )
+           )
       )
 
 
@@ -1228,13 +1234,15 @@
 ; A
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn eliminar-cero-decimal [n]
-      (cond
-        (nil? n) n
-        (string? n) n
-        (symbol? n) (str n)
-        (== (int n) n) (int n)
-        :else (/ (* n 10) 10)
-        )
+      (println "eliminar-cero-decimal" n)
+      (spy (cond
+             (nil? n) n
+             (string? n) n
+             (symbol? n) (str n)
+             (boolean? n) n
+             (== (int n) n) (int n)
+             :else (/ (* n 10) 10)
+             ))
       )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

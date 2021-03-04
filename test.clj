@@ -14,6 +14,8 @@
          (is (= true (operador? (symbol "+"))))
          (is (= true (operador? (symbol "="))))
          (is (= false (operador? (symbol "%"))))
+         (is (= true (operador? (symbol ">"))))
+         (is (= true (operador? (symbol "<"))))
          )
 
 (deftest test-variable?
