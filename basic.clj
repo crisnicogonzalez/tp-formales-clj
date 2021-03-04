@@ -549,6 +549,7 @@
       (if (or (contains? (set sentencia) nil) (and (palabra-reservada? (first sentencia)) (= (second sentencia) '=)))
         (do (dar-error 16 (amb 1)) [nil amb])               ; Syntax error
         (case (first sentencia)
+              END [nil amb]
               PRINT (let [args (spy (next sentencia)), resu (imprimir args amb)]
                          (if (and (nil? resu) (some? args))
                            [nil amb]
@@ -713,7 +714,7 @@
 (defn operador? [x]
       (println "operador?" x)
       (spy (if
-             (nil? x)
+             (or (nil? x) (string? x))
              false
              (contains? (set '("+" "-" "*" "/" "^" "=" "<>" "<:" "<=:" ">:" ">=:" "?" ":" "AND" "OR" "<" ">")) (name x))
              )
